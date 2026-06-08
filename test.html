@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>비밀의 방 탈출 게임</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .container {
+            background-color: #333;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            max-width: 400px;
+            width: 90%;
+        }
+        .stage {
+            display: none;
+        }
+        .active {
+            display: block;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            margin-top: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 15px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .passcode-display {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #ffd700;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🕵️‍♂️ 시크릿 미션</h2>
+    
+    <div id="stage1" class="stage active">
+        <h3>Stage 1</h3>
+        <p>Q. 물은 100도에서 끓는다. 맞으면 O, 틀리면 X</p>
+        <button onclick="checkAnswer(1, 'O')">O</button>
+        <button onclick="checkAnswer(1, 'X')">X</button>
+    </div>
+
+    <div id="stage2" class="stage">
+        <h3>Stage 2</h3>
+        <p>Q. 대한민국의 수도는 어디인가요?</p>
+        <input type="text" id="ans2" placeholder="정답 입력">
+        <br>
+        <button onclick="checkTextAnswer(2, '서울')">확인</button>
+    </div>
+
+    <div id="stage3" class="stage">
+        <h3>Stage 3</h3>
+        <p>Q. 다음 중 과일이 아닌 것은?</p>
+        <button onclick="checkAnswer(3, '사과')">사과</button>
+        <button onclick="checkAnswer(3, '당근')">당근</button>
+        <button onclick="checkAnswer(3, '바나나')">바나나</button>
+    </div>
+
+    <div id="stage4" class="stage">
+        <h3>Stage 4</h3>
+        <p>Q. 5 + 7 x 2 = ?</p>
+        <input type="text" id="ans4" placeholder="정답 입력">
+        <br>
+        <button onclick="checkTextAnswer(4, '19')">확인</button>
+    </div>
+
+    <div id="stage5" class="stage">
+        <h3>Stage 5</h3>
+        <p>Q. 거미의 다리는 6개이다.</p>
+        <button onclick="checkAnswer(5, 'O')">O</button>
+        <button onclick="checkAnswer(5, 'X')">X</button>
+    </div>
+
+    <div id="stage6" class="stage">
+        <h3>Stage 6</h3>
+        <p>Q. 밤하늘에서 가장 밝은 별(항성)의 이름은?</p>
+        <input type="text" id="ans6" placeholder="정답 입력 (시리우스)">
+        <br>
+        <button onclick="checkTextAnswer(6, '시리우스')">확인</button>
+    </div>
+
+    <div id="finalStage" class="stage">
+        <h3>🔒 최종 문</h3>
+        <p>지금까지 모은 6자리의 패스코드를 입력하세요.</p>
+        <input type="text" id="finalPasscode" placeholder="패스코드 입력">
+        <br>
+        <button onclick="checkFinal()">탈출하기</button>
+    </div>
+
+    <div class="passcode-display" id="collectedPasscodes">획득한 패스코드: (없음)</div>
+</div>
+
+<script>
+    // 각 단계를 통과할 때마다 부여할 패스코드 글자들 (S, M, C, R, A, D)
+    const passcodes = ['S', 'M', 'C', 'R', 'A', 'D'];
+    let userPasscode = "";
+
+    // 버튼형 퀴즈 (OX, 객관식) 정답 체크
+    function checkAnswer(stage, answer) {
+        let isCorrect = false;
+        if (stage === 1 && answer === 'O') isCorrect = true;
+        if (stage === 3 && answer === '당근') isCorrect = true;
+        if (stage === 5 && answer === 'X') isCorrect = true;
+
+        handleResult(stage, isCorrect);
+    }
+
+    // 주관식 텍스트 퀴즈 정답 체크
+    function checkTextAnswer(stage, correctAnswer) {
+        let userInput = document.getElementById('ans' + stage).value.trim();
+        let isCorrect = (userInput === correctAnswer);
+        
+        handleResult(stage, isCorrect);
+    }
+
+    // 정답/오답에 따른 화면 전환 처리 로직
+    function handleResult(stage, isCorrect) {
+        if (isCorrect) {
+            alert("정답입니다! 패스코드 '" + passcodes[stage-1] + "'를 획득했습니다.");
+            userPasscode += passcodes[stage-1];
+            document.getElementById('collectedPasscodes').innerText = "획득한 패스코드: " + userPasscode;
+            
+            // 현재 스테이지 숨기기
+            document.getElementById('stage' + stage).classList.remove('active');
+            
+            // 다음 스테이지 보여주기
+            if (stage < 6) {
+                document.getElementById('stage' + (stage + 1)).classList.add('active');
+            } else {
+                document.getElementById('finalStage').classList.add('active');
+            }
+        } else {
+            alert("틀렸습니다. 다시 생각해보세요!");
+        }
+    }
+
+    // 최종 패스코드 확인
+    function checkFinal() {
+        let finalInput = document.getElementById('finalPasscode').value.toUpperCase().trim();
+        if (finalInput === "SMCRAD") {
+            alert("🎉 축하합니다! 모든 미션을 완료하고 게임을 클리어하셨습니다! 🎉");
+            // 게임 완료 후 보여줄 내용 (예: 구글폼 링크, 축하 이미지 등)으로 연결할 수 있습니다.
+        } else {
+            alert("패스코드가 일치하지 않습니다.");
+        }
+    }
+</script>
+
+</body>
+</html>
